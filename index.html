@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TXTPC-0 技術仕様書</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+JP:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #111;
+    --dark:  #333;
+    --mid:   #666;
+    --light: #aaa;
+    --rule:  #ddd;
+    --bg:    #fafafa;
+    --white: #fff;
+    --accent: #1a56db;
+    --accent-light: #e8eefb;
+    --code-bg: #f3f3f3;
+    --warn: #b45309;
+    --warn-bg: #fef9ec;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--dark);
+    font-family: 'IBM Plex Sans JP', sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 32px 100px;
+  }
+
+  /* ヘッダー */
+  .doc-header {
+    border-bottom: 3px solid var(--black);
+    padding: 56px 0 32px;
+    margin-bottom: 56px;
+  }
+
+  .doc-kicker {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--mid);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .doc-title {
+    font-size: clamp(36px, 6vw, 60px);
+    font-weight: 600;
+    color: var(--black);
+    line-height: 1.1;
+    letter-spacing: -1px;
+  }
+
+  .doc-title em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .doc-subtitle {
+    margin-top: 10px;
+    font-size: 15px;
+    color: var(--mid);
+    font-weight: 300;
+  }
+
+  .doc-meta {
+    margin-top: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+
+  .meta-item {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--mid);
+  }
+
+  .meta-item strong { color: var(--dark); font-weight: 600; }
+
+  /* 目次 */
+  .toc {
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-left: 4px solid var(--accent);
+    padding: 28px 32px;
+    margin-bottom: 64px;
+  }
+
+  .toc-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--mid);
+    margin-bottom: 16px;
+  }
+
+  .toc ol { list-style: decimal; padding-left: 20px; }
+  .toc li { margin: 4px 0; }
+  .toc a { color: var(--accent); text-decoration: none; font-size: 14px; }
+  .toc a:hover { text-decoration: underline; }
+
+  /* セクション */
+  section { margin-bottom: 72px; }
+
+  .section-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+
+  h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--black);
+    letter-spacing: -0.3px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--rule);
+  }
+
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--black);
+    margin: 32px 0 10px;
+  }
+
+  p { color: var(--dark); margin-bottom: 14px; font-weight: 300; }
+
+  /* 仕様サマリーカード */
+  .spec-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin: 24px 0;
+  }
+
+  .spec-cell {
+    background: var(--white);
+    padding: 18px 20px;
+  }
+
+  .spec-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--light);
+    margin-bottom: 6px;
+  }
+
+  .spec-value {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--black);
+    line-height: 1;
+  }
+
+  .spec-unit { font-size: 12px; color: var(--mid); font-weight: 300; margin-left: 3px; }
+  .spec-note { font-size: 11px; color: var(--mid); margin-top: 4px; font-weight: 300; }
+
+  /* 命令セット表 */
+  .cmd-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+
+  .cmd-table thead tr { background: var(--black); color: var(--white); }
+
+  .cmd-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    font-weight: 600;
+  }
+
+  .cmd-table tbody tr {
+    border-bottom: 1px solid var(--rule);
+    transition: background 0.15s;
+  }
+
+  .cmd-table tbody tr:hover { background: var(--accent-light); }
+
+  .cmd-table td {
+    padding: 14px 16px;
+    vertical-align: top;
+    font-weight: 300;
+  }
+
+  .mono {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--black);
+  }
+
+  .opcode {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--mid);
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  .syntax { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--accent); }
+
+  /* 機能カードグリッド */
+  .feature-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin: 16px 0;
+  }
+
+  .feature-card {
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-top: 3px solid var(--accent);
+    padding: 20px 22px;
+  }
+
+  .feature-name {
+    font-weight: 600;
+    color: var(--black);
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .feature-desc {
+    font-size: 13px;
+    color: var(--mid);
+    font-weight: 300;
+    line-height: 1.7;
+  }
+
+  .badge {
+    display: inline-block;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 2px;
+    margin-left: 8px;
+    vertical-align: middle;
+    letter-spacing: 1px;
+  }
+
+  /* テーブル共通 */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 16px 0;
+  }
+
+  .data-table thead tr { background: var(--code-bg); }
+
+  .data-table th {
+    padding: 10px 14px;
+    text-align: left;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--mid);
+    border-bottom: 2px solid var(--rule);
+    font-weight: 600;
+  }
+
+  .data-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: middle;
+    font-weight: 300;
+  }
+
+  .data-table tbody tr:hover td { background: var(--code-bg); }
+
+  .t-addr { font-family: 'IBM Plex Mono', monospace; color: var(--accent); font-weight: 600; }
+  .t-name { font-family: 'IBM Plex Mono', monospace; color: var(--black); font-weight: 600; }
+  .t-dim  { font-family: 'IBM Plex Mono', monospace; color: var(--mid); font-size: 12px; }
+
+  /* アーキテクチャ図 */
+  .arch-diagram {
+    background: var(--code-bg);
+    border: 1px solid var(--rule);
+    padding: 28px 32px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--dark);
+    white-space: pre;
+    overflow-x: auto;
+    margin: 16px 0;
+  }
+
+  /* ノートボックス */
+  .note {
+    border: 1px solid #fcd34d;
+    border-left: 4px solid var(--warn);
+    background: var(--warn-bg);
+    padding: 14px 20px;
+    margin: 20px 0;
+    font-size: 13px;
+    color: var(--warn);
+    line-height: 1.7;
+  }
+
+  .note strong {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* コードブロック */
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--rule);
+    padding: 20px 24px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-x: auto;
+    margin: 14px 0;
+    color: var(--black);
+  }
+
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    background: var(--code-bg);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--black);
+  }
+
+  /* フッター */
+  footer {
+    border-top: 1px solid var(--rule);
+    padding: 32px 0;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--light);
+    letter-spacing: 1px;
+  }
+
+  @media (max-width: 600px) {
+    .page { padding: 0 16px 60px; }
+    .doc-header { padding: 32px 0 24px; }
+    .arch-diagram { font-size: 10px; padding: 16px; }
+    .doc-meta { gap: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ヘッダー -->
+  <header class="doc-header">
+    <div class="doc-kicker">Technical Specification — Rev 1.0</div>
+    <h1 class="doc-title">TXTPC‑<em>0</em></h1>
+    <p class="doc-subtitle">テキストコンピューター技術仕様書 ／ 最小命令セット・多機能アーキテクチャ</p>
+    <div class="doc-meta">
+      <span class="meta-item">文書番号 <strong>TP0-SPEC-0001</strong></span>
+      <span class="meta-item">発行日 <strong>2025-06-01</strong></span>
+      <span class="meta-item">改訂 <strong>1.0.4</strong></span>
+      <span class="meta-item">策定 <strong>架空研究院 計算機部門</strong></span>
+    </div>
+  </header>
+
+  <!-- 目次 -->
+  <nav class="toc">
+    <div class="toc-title">目次</div>
+    <ol>
+      <li><a href="#overview">概要と設計思想</a></li>
+      <li><a href="#specs">主要仕様</a></li>
+      <li><a href="#isa">命令セット（ISA）</a></li>
+      <li><a href="#architecture">アーキテクチャ</a></li>
+      <li><a href="#memory">メモリマップ</a></li>
+      <li><a href="#io">入出力・通信機能</a></li>
+      <li><a href="#storage">記憶媒体</a></li>
+      <li><a href="#example">プログラム例</a></li>
+      <li><a href="#philosophy">設計哲学ノート</a></li>
+    </ol>
+  </nav>
+
+  <!-- §1 概要 -->
+  <section id="overview">
+    <div class="section-num">§ 1</div>
+    <h2>概要と設計思想</h2>
+    <p>
+      <strong>TXTPC-0</strong>（テキストコンピューター・ゼロ）は、<em>命令数を極限まで削減しながら</em>、現代のパーソナルコンピューターに匹敵する機能を実現することを目標として設計された架空のテキストベース計算機械です。
+    </p>
+    <p>
+      全命令数はわずか <strong>8 命令</strong>のみ。しかしその 8 命令は、テキスト処理・ファイルシステム・ネットワーク通信・タイマー・テキストUI・プロセス管理に至るまで、あらゆる操作を表現できるよう設計されています。
+    </p>
+    <p>
+      秘訣は「すべてをテキストストリームとして統一する」という設計哲学の徹底です。ファイルも、ネットワーク接続も、デバイスも、プロセス間通信も、すべて「名前付きストリーム」として同一の命令で扱います。命令の少なさは制約ではなく、設計の純粋さの証明です。
+    </p>
+  </section>
+
+  <!-- §2 主要仕様 -->
+  <section id="specs">
+    <div class="section-num">§ 2</div>
+    <h2>主要仕様</h2>
+
+    <div class="spec-grid">
+      <div class="spec-cell">
+        <div class="spec-label">命令数</div>
+        <div class="spec-value">8<span class="spec-unit">命令</span></div>
+        <div class="spec-note">すべての操作をカバー</div>
+      </div>
+      <div class="spec-cell">
+        <div class="spec-label">語長</div>
+        <div class="spec-value">64<span class="spec-unit">bit</span></div>
+        <div class="spec-note">可変長テキスト対応</div>
+      </div>
+      <div class="spec-cell">
+        <div class="spec-label">アドレス空間</div>
+        <div class="spec-value">48<span class="spec-unit">bit</span></div>
+        <div class="spec-note">256 TB 仮想アドレス</div>
+      </div>
+      <div class="spec-cell">
+        <div class="spec-label">レジスタ</div>
+        <div class="spec-value">16<span class="spec-unit">本</span></div>
+        <div class="spec-note">汎用テキストバッファ</div>
+      </div>
+      <div class="spec-cell">
+        <div class="spec-label">ストリーム数</div>
+        <div class="spec-value">65536<span class="spec-unit">本</span></div>
+        <div class="spec-note">同時オープン可能</div>
+      </div>
+      <div class="spec-cell">
+        <div class="spec-label">文字コード</div>
+        <div class="spec-value">UTF-8</div>
+        <div class="spec-note">ネイティブ対応</div>
+      </div>
+      <div class="spec-cell">
+        <div class="spec-label">動作クロック</div>
+        <div class="spec-value">1<span class="spec-unit">GHz</span></div>
+        <div class="spec-note">エミュ実装可</div>
+      </div>
+      <div class="spec-cell">
+        <div class="spec-label">RAM</div>
+        <div class="spec-value">最大 1<span class="spec-unit">TB</span></div>
+        <div class="spec-note">テキストキャッシュ込</div>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>NOTE</strong>
+      TXTPC-0 はハードウェアとして実装することも、既存コンピューター上のソフトウェアエミュレーターとして動作させることも可能です。本仕様書はいずれの実装にも適用されます。
+    </div>
+  </section>
+
+  <!-- §3 命令セット -->
+  <section id="isa">
+    <div class="section-num">§ 3</div>
+    <h2>命令セット（ISA）</h2>
+    <p>
+      TXTPC-0 の命令セットは下記の <strong>8 命令</strong> のみで構成されます。オペコードは 3 ビット（0〜7）で表現されます。すべての命令はテキストストリームの読み書き・制御を基本とし、それ以外の一切の概念を持ちません。
+    </p>
+
+    <table class="cmd-table">
+      <thead>
+        <tr>
+          <th>命令名</th>
+          <th>オペコード</th>
+          <th>構文</th>
+          <th>動作説明</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="mono">OPEN</span></td>
+          <td><span class="opcode">000</span></td>
+          <td><span class="syntax">OPEN &lt;名前&gt; Rx</span></td>
+          <td>名前付きストリームを開き、ハンドルをレジスタ Rx に格納する。ファイル・デバイス・ネットワーク・プロセスすべて同一形式。</td>
+        </tr>
+        <tr>
+          <td><span class="mono">READ</span></td>
+          <td><span class="opcode">001</span></td>
+          <td><span class="syntax">READ Rx Ry</span></td>
+          <td>Rx のストリームから次の「トークン」（空白 / 改行区切り）を読み込み、テキストとしてレジスタ Ry に格納する。</td>
+        </tr>
+        <tr>
+          <td><span class="mono">WRITE</span></td>
+          <td><span class="opcode">010</span></td>
+          <td><span class="syntax">WRITE Rx Ry</span></td>
+          <td>レジスタ Ry のテキストを Rx のストリームへ書き込む。画面出力も、ネットワーク送信も、ファイル保存もこれ一つ。</td>
+        </tr>
+        <tr>
+          <td><span class="mono">COPY</span></td>
+          <td><span class="opcode">011</span></td>
+          <td><span class="syntax">COPY Rx Ry</span></td>
+          <td>レジスタ Rx の内容をレジスタ Ry にコピーする。即値テキストをレジスタに格納する際にも使用。</td>
+        </tr>
+        <tr>
+          <td><span class="mono">MATCH</span></td>
+          <td><span class="opcode">100</span></td>
+          <td><span class="syntax">MATCH Rx Ry Rz</span></td>
+          <td>Rx のテキストを Ry のパターン（正規表現）でマッチングし、結果（一致テキストまたは空文字）を Rz に格納する。条件分岐の唯一の基盤。</td>
+        </tr>
+        <tr>
+          <td><span class="mono">JOIN</span></td>
+          <td><span class="opcode">101</span></td>
+          <td><span class="syntax">JOIN Rx Ry Rz</span></td>
+          <td>Rx と Ry のテキストを連結し Rz に格納する。数値演算もテキスト変換後にこれで式文字列を組み立てる。</td>
+        </tr>
+        <tr>
+          <td><span class="mono">JUMP</span></td>
+          <td><span class="opcode">110</span></td>
+          <td><span class="syntax">JUMP Rx &lt;ラベル&gt;</span></td>
+          <td>Rx が空文字でない場合、指定ラベルへ制御を移す。MATCH と組み合わせることで if / while / for をすべて表現できる。</td>
+        </tr>
+        <tr>
+          <td><span class="mono">CLOSE</span></td>
+          <td><span class="opcode">111</span></td>
+          <td><span class="syntax">CLOSE Rx</span></td>
+          <td>Rx のストリームを閉じる。プロセス終了もこれで行う（標準出力ストリームをクローズ）。</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <strong>IMPORTANT</strong>
+      算術演算命令は存在しません。数値はすべてテキストとして表現し、特殊ストリーム <code>sys:calc</code> に式文字列を WRITE → READ することで計算結果を取得します。これにより整数・浮動小数点・任意精度演算が統一的に扱えます。
+    </div>
+  </section>
+
+  <!-- §4 アーキテクチャ -->
+  <section id="architecture">
+    <div class="section-num">§ 4</div>
+    <h2>アーキテクチャ</h2>
+    <p>
+      TXTPC-0 のアーキテクチャは「ストリームバス」を中心に構成されます。CPU・メモリ・すべての周辺機能は、ストリームバスを介してテキストを交換するだけで動作します。
+    </p>
+
+    <div class="arch-diagram">
+┌──────────────────────────────────────────────────────────────┐
+│                        TXTPC-0  System                       │
+│                                                              │
+│  ┌────────────────┐      ┌──────────────────────────────┐   │
+│  │  CPU Core      │      │     Stream Name Resolver     │   │
+│  │  ─────────     │      │  (ストリーム名 → ハンドル 変換)│   │
+│  │  R0 〜 R15     │◀────▶│                              │   │
+│  │  PC / SP / FL  │      └──────────────┬───────────────┘   │
+│  │  8 命令デコーダ │                     │                    │
+│  └────────────────┘             ストリームバス               │
+│                           ┌──────────────┴───────────────┐   │
+│                           │                              │   │
+│         ┌─────────────────┼──────────────────┐          │   │
+│         ▼                 ▼                  ▼          │   │
+│  ┌─────────────┐  ┌─────────────┐  ┌───────────────┐   │   │
+│  │  fs:        │  │  net:       │  │  sys:         │   │   │
+│  │  ファイル    │  │  TCP / UDP  │  │  calc / timer │   │   │
+│  │  システム    │  │  HTTP / WS  │  │  proc / tty   │   │   │
+│  │ （仮想 VFS） │  │  DNS / TLS  │  │  env / clip   │   │   │
+│  └──────┬──────┘  └─────────────┘  └───────────────┘   │   │
+│         │                                               │   │
+│  ┌──────▼─────────────────────────────────────────┐    │   │
+│  │  Storage Layer （記憶媒体抽象化）                 │    │   │
+│  │  RAM キャッシュ ／ SSD ／ ネットワークストレージ   │    │   │
+│  └────────────────────────────────────────────────┘    │   │
+└──────────────────────────────────────────────────────────────┘
+    </div>
+
+    <h3>レジスタ仕様</h3>
+    <p>
+      16 本の汎用レジスタ（R0〜R15）は、それぞれ任意長の UTF-8 テキスト文字列を保持します。固定ビット長ではなく「テキストバッファ」として機能するため、1 文字でも 1 MB の文書でも同じように扱えます。スタックポインタ（SP）とプログラムカウンタ（PC）も内部的にはストリーム位置を示すテキストアドレスです。
+    </p>
+
+    <h3>ストリーム名前空間</h3>
+    <p>あらゆるリソースを以下の名前空間プレフィックスで統一的に参照します。</p>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>プレフィックス</th>
+          <th>対象リソース</th>
+          <th>記述例</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="t-addr">fs:</td>
+          <td>ファイルシステム</td>
+          <td class="t-dim">fs:/home/user/doc.txt</td>
+        </tr>
+        <tr>
+          <td class="t-addr">net:</td>
+          <td>ネットワーク通信（TCP/UDP）</td>
+          <td class="t-dim">net:tcp://192.168.1.1:8080</td>
+        </tr>
+        <tr>
+          <td class="t-addr">http:</td>
+          <td>HTTP リクエスト</td>
+          <td class="t-dim">http:GET:https://example.com</td>
+        </tr>
+        <tr>
+          <td class="t-addr">sys:</td>
+          <td>システムサービス</td>
+          <td class="t-dim">sys:calc, sys:timer, sys:proc</td>
+        </tr>
+        <tr>
+          <td class="t-addr">dev:</td>
+          <td>デバイス</td>
+          <td class="t-dim">dev:keyboard, dev:display</td>
+        </tr>
+        <tr>
+          <td class="t-addr">pipe:</td>
+          <td>プロセス間通信</td>
+          <td class="t-dim">pipe:my-channel</td>
+        </tr>
+        <tr>
+          <td class="t-addr">clip:</td>
+          <td>クリップボード</td>
+          <td class="t-dim">clip:system</td>
+        </tr>
+        <tr>
+          <td class="t-addr">enc:</td>
+          <td>暗号化レイヤー（重ね掛け可）</td>
+          <td class="t-dim">enc:aes256:fs:/secret.txt</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- §5 メモリマップ -->
+  <section id="memory">
+    <div class="section-num">§ 5</div>
+    <h2>メモリマップ</h2>
+    <p>
+      仮想アドレス空間（48 bit）は以下のように区分されます。物理メモリの割り当ては実装依存ですが、論理レイアウトはすべての実装で共通です。
+    </p>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>アドレス先頭</th>
+          <th>領域名</th>
+          <th>サイズ</th>
+          <th>用途</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="t-addr">0x0000_0000_0000</td>
+          <td class="t-name">ゼロページ</td>
+          <td class="t-dim">4 KB</td>
+          <td>NULL 参照検出・アクセス禁止領域</td>
+        </tr>
+        <tr>
+          <td class="t-addr">0x0000_0000_1000</td>
+          <td class="t-name">ブートROM</td>
+          <td class="t-dim">64 KB</td>
+          <td>起動スクリプト・初期ストリーム名前解決テーブル</td>
+        </tr>
+        <tr>
+          <td class="t-addr">0x0000_0001_0000</td>
+          <td class="t-name">システム領域</td>
+          <td class="t-dim">16 MB</td>
+          <td>カーネルストリームバス・デバイスドライバ</td>
+        </tr>
+        <tr>
+          <td class="t-addr">0x0000_0100_0000</td>
+          <td class="t-name">テキストキャッシュ</td>
+          <td class="t-dim">256 MB</td>
+          <td>頻繁にアクセスされるストリームのバッファリング</td>
+        </tr>
+        <tr>
+          <td class="t-addr">0x0000_1100_0000</td>
+          <td class="t-name">ユーザー空間</td>
+          <td class="t-dim">〜 128 TB</td>
+          <td>プログラム・スタック・ヒープ（テキスト形式）</td>
+        </tr>
+        <tr>
+          <td class="t-addr">0x7FFF_FFFF_F000</td>
+          <td class="t-name">ストリームハンドル表</td>
+          <td class="t-dim">256 MB</td>
+          <td>最大 65536 本のオープンストリーム管理テーブル</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- §6 入出力・通信機能 -->
+  <section id="io">
+    <div class="section-num">§ 6</div>
+    <h2>入出力・通信機能</h2>
+    <p>
+      TXTPC-0 の入出力はすべてストリーム経由です。命令を追加することなく、以下の機能を完全に実現します。
+    </p>
+
+    <div class="feature-list">
+      <div class="feature-card">
+        <div class="feature-name">テキスト端末 <span class="badge">標準</span></div>
+        <div class="feature-desc"><code>dev:tty</code> ストリームへの READ / WRITE で、キーボード入力・画面出力を行う。VT100 エスケープシーケンスも文字列として送出するだけでカーソル制御・色付けが可能。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-name">TCP / UDP 通信 <span class="badge">標準</span></div>
+        <div class="feature-desc"><code>net:tcp://host:port</code> を OPEN するだけでソケット接続確立。WRITE でデータ送信、READ でデータ受信。TLS も <code>net:tls://</code> で透過対応。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-name">HTTP クライアント <span class="badge">標準</span></div>
+        <div class="feature-desc"><code>http:GET:https://url</code> を OPEN → READ でレスポンスボディ取得。POST は WRITE でボディ送信後に READ。REST API 呼び出しが 3 命令で完結する。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-name">WebSocket <span class="badge">標準</span></div>
+        <div class="feature-desc"><code>net:ws://host/path</code> をオープンすることで双方向リアルタイム通信。READ / WRITE を繰り返すだけでメッセージ交換できる。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-name">メール送受信 <span class="badge">標準</span></div>
+        <div class="feature-desc"><code>net:smtp://</code> ストリームに宛先・件名・本文をテキストとして WRITE するだけ。受信は <code>net:imap://</code> ストリームから READ。MIMEエンコードはシステムが自動処理。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-name">DNS 問い合わせ <span class="badge">標準</span></div>
+        <div class="feature-desc"><code>sys:dns</code> に「resolve example.com」と WRITE → READ で IP アドレス取得。逆引き・MX レコードも同様のテキスト形式で照会できる。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-name">Bluetooth / シリアル <span class="badge">オプション</span></div>
+        <div class="feature-desc"><code>dev:bt:XX:XX:XX</code> で Bluetooth デバイスとテキスト通信。シリアル通信は <code>dev:serial:/dev/ttyS0</code> で同一インターフェース。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-name">プロセス間通信 <span class="badge">標準</span></div>
+        <div class="feature-desc">名前付きパイプ <code>pipe:名前</code> を OPEN するだけで複数プロセスがリアルタイムにテキストを共有。セマフォも「1」/「0」の READ / WRITE で実現。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §7 記憶媒体 -->
+  <section id="storage">
+    <div class="section-num">§ 7</div>
+    <h2>記憶媒体</h2>
+    <p>
+      TXTPC-0 は単一の <code>fs:</code> 抽象を通じて、あらゆる物理記憶媒体を透過的に扱います。マウント先のパスを変えるだけで、同じコードが異なるストレージで動作します。
+    </p>
+
+    <div class="feature-list">
+      <div class="feature-card">
+        <div class="feature-name">揮発性 RAM ディスク</div>
+        <div class="feature-desc">最高速。<code>fs:/ram/</code> にマウント。作業中のテキストバッファ・一時ファイルに使用。電源断で消去される。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-name">フラッシュ / SSD</div>
+        <div class="feature-desc"><code>fs:/ssd/</code> にマウント。主記憶。書き込みは非同期キャッシュに蓄積後、バックグラウンドでフラッシュされる。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-name">ネットワークストレージ</div>
+        <div class="feature-desc"><code>fs:/net/share/</code> にマウント。実体は NFS / SMB / SFTP 等。アクセスはローカルと完全に同一の命令で行える。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-name">クラウドオブジェクトストレージ</div>
+        <div class="feature-desc">S3 互換ストレージを <code>fs:/cloud/bucket/</code> にマウント。大規模テキストデータの保存・配信に対応。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-name">暗号化ボリューム</div>
+        <div class="feature-desc"><code>enc:aes256:fs:/secret/</code> と名前空間を重ねるだけで透過暗号化。鍵管理は <code>sys:keyring</code> 経由。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-name">バージョン管理 FS</div>
+        <div class="feature-desc"><code>fs:/vcs/repo/</code> にマウントすると、すべての WRITE が自動的にバージョン記録される。差分も READ で取得可能。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §8 プログラム例 -->
+  <section id="example">
+    <div class="section-num">§ 8</div>
+    <h2>プログラム例</h2>
+
+    <h3>例 1 ─ 「Hello, World!」を画面に出力</h3>
+<pre>OPEN  dev:tty        R0    ; 端末ストリームを開く
+COPY  "Hello, World!\n" R1  ; テキストをレジスタにセット
+WRITE R0 R1               ; 端末へ書き込む
+CLOSE R0                  ; ストリームを閉じる</pre>
+
+    <h3>例 2 ─ HTTP GET してファイルに保存</h3>
+<pre>OPEN  http:GET:https://example.com/data.txt  R0  ; HTTP ストリームを開く
+OPEN  fs:/home/user/data.txt                 R1  ; 保存先を開く
+:loop
+  READ  R0 R2            ; レスポンスを 1 トークン読む
+  JUMP  R2 :write        ; 内容があれば書き込みへ
+  JUMP  R0 :done         ; なければ終了
+:write
+  WRITE R1 R2            ; ファイルへ書き込む
+  JUMP  "1" :loop        ; 常にループ継続
+:done
+CLOSE R0
+CLOSE R1</pre>
+
+    <h3>例 3 ─ 数値の加算（sys:calc を使用）</h3>
+<pre>OPEN  sys:calc  R0    ; 計算サービスストリームを開く
+COPY  "37"      R1
+COPY  "85"      R2
+JOIN  R1 "+"    R3    ; "37+" を作る
+JOIN  R3 R2     R4    ; "37+85" を作る
+WRITE R0 R4           ; 式を送信
+READ  R0 R5           ; 結果 "122" を受信
+CLOSE R0</pre>
+
+    <h3>例 4 ─ TCP サーバー（接続を受け付けて応答）</h3>
+<pre>OPEN  net:tcp:listen:0.0.0.0:8080  R0  ; 待受ストリームを開く
+:accept
+  READ  R0 R1        ; 接続を受け入れる（ハンドルが R1 に）
+  JUMP  R1 :handle
+  JUMP  "1" :accept
+:handle
+  READ  R1 R2        ; リクエストを読む
+  COPY  "OK\n" R3
+  WRITE R1 R3        ; レスポンスを返す
+  CLOSE R1           ; 接続を閉じる
+  JUMP  "1" :accept  ; 次の接続へ</pre>
+  </section>
+
+  <!-- §9 設計哲学 -->
+  <section id="philosophy">
+    <div class="section-num">§ 9</div>
+    <h2>設計哲学ノート</h2>
+    <p>
+      「なぜ 8 命令で十分なのか」という問いへの答えは、<em>コンピューターが本質的に行う操作は「どこかから読んで、どこかへ書く」という一つのことだけである</em>、という洞察にあります。
+    </p>
+    <p>
+      命令セットが小さいことは、実装の正確さを高めます。8 命令のデコーダは検証が容易であり、セキュリティ脆弱性の攻撃面積が最小化されます。プロセッサのゲート数が少ないため、超低消費電力デバイスへの搭載も容易です。
+    </p>
+    <p>
+      一方で「多機能」を実現するのは命令ではなく<strong>ストリーム名前空間の豊かさ</strong>です。新しい機能（例：量子乱数生成）を追加したい場合、命令セットに手を加える必要はなく、<code>sys:qrng</code> という名前のストリームを新設するだけです。命令セットは完全に安定したまま、システム機能は無制限に拡張できます。
+    </p>
+    <div class="note">
+      <strong>DESIGN PRINCIPLE</strong>
+      命令の少なさと機能の豊かさはトレードオフではない。抽象化のレイヤーを適切に分けることで両立できる。TXTPC-0 はその証明である。
+    </div>
+  </section>
+
+  <footer>
+    <span>TXTPC-0 TECHNICAL SPECIFICATION</span>
+    <span>Rev 1.0.4 — 2025-06-01</span>
+    <span>架空研究院 計算機部門</span>
+  </footer>
+
+</div>
+</body>
+</html>
